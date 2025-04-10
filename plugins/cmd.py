@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 async def start(client, message):
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("❓ Help", callback_data="help"), InlineKeyboardButton("ℹ️ About", callback_data="about")],
-        [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/AnS_Bots")]
+        [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/ftmbotzx")]
     ])
-    if not await db.is_user_exist(message.from_user.id):
+    if not await db.is_user_exist(message.from_u09ser.id):
         await db.add_user(message.from_user.id, message.from_user.first_name)
         await client.send_message(
             LOG_CHANNEL, 
@@ -45,19 +45,18 @@ async def start_hendler(client, callback_query):
     ])
     
     await callback_query.message.edit_text(
-        "🎬✨ **Welcome to the Ultimate YouTube Downloader!** ✨🎬\n\n"
-        "🚀 **Download YouTube Videos, Shorts & Music Instantly!** 🎶\n"
-        "💫 Just send any YouTube link & get **high-speed downloads in seconds!**\n\n"
-        "⚡ **Fast & Secure Downloads**\n"
-        "✅ **Supports Videos, Shorts, MP3, MP4 in HD Quality**\n"
-        "🎵 **Download Audio (MP3) & Video (MP4)**\n"
-        "ꜱᴛᴀʀᴛ ʙʏ ᴅʀᴏᴘᴘɪɴɢ ᴀ ʟɪɴᴋ ʙᴇʟᴏᴡ! \n\n"
-        "💖 **Enjoy Hassle-Free Downloads!** 💖",
-        " ────────────────────────\n"
-        "✨ **Cʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ**](t.me/ftmdeveloperz)"
-        reply_markup=buttons                
-    )
-
+    "🎬✨ **Welcome to the Ultimate YouTube Downloader!** ✨🎬\n\n"
+    "🚀 **Download YouTube Videos, Shorts & Music Instantly!** 🎶\n"
+    "💫 Just send any YouTube link & get **high-speed downloads in seconds!**\n\n"
+    "⚡ **Fast & Secure Downloads**\n"
+    "✅ **Supports Videos, Shorts, MP3, MP4 in HD Quality**\n"
+    "🎵 **Download Audio (MP3) & Video (MP4)**\n"
+    "ꜱᴛᴀʀᴛ ʙʏ ᴅʀᴏᴘᴘɪɴɢ ᴀ ʟɪɴᴋ ʙᴇʟᴏᴡ! \n\n"
+    "💖 **Enjoy Hassle-Free Downloads!** 💖"
+    " ────────────────────────\n"
+    "✨ **Cʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ**](t.me/ftmdeveloperz)",
+    reply_markup=buttons                
+    )0
 
 
 @Client.on_callback_query(filters.regex("help"))
