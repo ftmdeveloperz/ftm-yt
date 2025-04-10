@@ -25,15 +25,17 @@ async def start(client, message):
             f"**#NewUser 🔻**\n**ID -> `{message.from_user.id}`**\n**Name -> {message.from_user.mention}**"
         )
     await message.reply_text(
-        "🎬✨ **Welcome to the Ultimate YouTube Downloader!** ✨🎬\n\n"
-        "🚀 **Download YouTube Videos, Shorts & Music Instantly!** 🎶\n"
-        "💫 Just send any YouTube link & get **high-speed downloads in seconds!**\n\n"
-        "⚡ **Fast & Secure Downloads**\n"
+        "🎬✨ ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ **Fᴛᴍ TᴜʙᴇFᴇᴛᴄʜ** ✨🎬\n\n"
+        "🚀 ʏᴏᴜʀ ᴜʟᴛɪᴍᴀᴛᴇ ᴅᴇsᴛɪɴᴀᴛɪᴏɴ ꜰᴏʀ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ʏᴏᴜᴛᴜʙᴇ 🎥 ᴠɪᴅᴇᴏs, sʜᴏʀᴛs & ᴀᴜᴅɪᴏs ɪɴ sᴇᴄᴏɴᴅs!  
+\n"
+        "💫 ɴᴏ ᴄᴏᴍᴘʟɪᴄᴀᴛɪᴏɴs — ᴊᴜsᴛ sᴇɴᴅ ᴀɴʏ ʏᴏᴜᴛᴜʙᴇ ʟɪɴᴋ ᴀɴᴅ ᴄʜᴏᴏsᴇ ᴍᴘ3/ᴍᴘ4.
+\n\n"
+        "🔸 **ꜰᴇᴀᴛᴜʀᴇs** 🔸\n"
         "✅ **Supports Videos, Shorts, MP3, MP4 in HD Quality**\n"
         "🎵 **Download Audio (MP3) & Video (MP4)**\n"
         "🔹 **No Watermark, Full HD Quality**\n"
         "🌟 **Custom Thumbnails for Each Video**\n\n"
-        "💖 **Enjoy Hassle-Free Downloads!** 💖",
+        "✨ **Cʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ](t.me/ftmdeveloperz)**",
         reply_markup=buttons                
     )
 
@@ -41,7 +43,7 @@ async def start(client, message):
 async def start_hendler(client, callback_query):
     buttons = InlineKeyboardMarkup([
         [InlineKeyboardButton("❓ Help", callback_data="help"), InlineKeyboardButton("ℹ️ About", callback_data="about")],
-        [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/AnS_Bots")]
+        [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/ftmbotzx")]
     ])
     
     await callback_query.message.edit_text(
@@ -51,9 +53,10 @@ async def start_hendler(client, callback_query):
         "⚡ **Fast & Secure Downloads**\n"
         "✅ **Supports Videos, Shorts, MP3, MP4 in HD Quality**\n"
         "🎵 **Download Audio (MP3) & Video (MP4)**\n"
-        "🔹 **No Watermark, Full HD Quality**\n"
-        "🌟 **Custom Thumbnails for Each Video**\n\n"
+        "ꜱᴛᴀʀᴛ ʙʏ ᴅʀᴏᴘᴘɪɴɢ ᴀ ʟɪɴᴋ ʙᴇʟᴏᴡ! \n\n"
         "💖 **Enjoy Hassle-Free Downloads!** 💖",
+        " ────────────────────────\n"
+        "✨ **Cʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ**](t.me/ftmdeveloperz)"
         reply_markup=buttons                
     )
 
@@ -104,7 +107,7 @@ async def about(client, callback_query):
         "➤ **Blazing Fast & Secure**\n"
         "➤ **Unlimited Downloads**\n"
         "➤ **Easy-to-use Interface**\n\n"
-        "💎 **Developed By: [AnS </> Team](https://t.me/AnS_team)**\n"
+        "💎 **Developed By: [Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ](https://t.me/ftmdeveloperz)**\n"
         "💖 **Enjoy & Share!**",
         reply_markup=buttons,
         disable_web_page_preview=True
