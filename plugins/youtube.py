@@ -576,9 +576,9 @@ async def process_youtube_link(client, message):
     except Exception as e:
         logging.exception("Error fetching available formats: %s", e)
         await message.reply_text(
-            "⚠️ **Oops! Something went wrong while fetching the formats. Please try again later.**\n\n"
-            "If the issue persists, please ask for help in our support group.\n\n"
-            "💬 Support Group: [SUPPORT](https://t.me/AnSBotsSupports)"
+            "⚠️ Oᴏᴘs! Sᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ ᴡʜɪʟᴇ ғᴇᴛᴄʜɪɴɢ ᴛʜᴇ ғᴏʀᴍᴀᴛs. Pʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ.\ɴ\ɴ"
+            "Iғ ᴛʜᴇ ɪssᴜᴇ ᴘᴇʀsɪsᴛs, ᴘʟᴇᴀsᴇ ᴀsᴋ ғᴏʀ ʜᴇʟᴘ ɪɴ ᴏᴜʀ sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ.\ɴ\ɴ"
+            "💬 Sᴜᴘᴘᴏʀᴛ Gʀᴏᴜᴘ: [SUPPORT](https://t.me/ftmbotzx_support)"
         )
         await fetching_message.delete()
         return
@@ -593,7 +593,7 @@ async def process_youtube_link(client, message):
             )
             await fetching_message.delete()
     else:
-        await message.reply_text("❌ **Sorry! No available video formats found for this link.**\n**💬 Support Group: [SUPPORT](https://t.me/AnSBotsSupports)**")
+        await message.reply_text("❌ **Sᴏʀʀʏ! Nᴏ ᴀᴠᴀɪʟᴀʙʟᴇ ᴠɪᴅᴇᴏ ғᴏʀᴍᴀᴛs ғᴏᴜɴᴅ ғᴏʀ ᴛʜɪs ʟɪɴᴋ. ʀᴇᴘᴏʀᴛ ᴛʜɪs ɪssᴜᴇ ᴛᴏ ᴏᴜʀ Dᴇᴠᴇʟᴏᴘᴇʀᴢ**\n**💬 Sᴜᴘᴘᴏʀᴛ Gʀᴏᴜᴘ: [SUPPORT](https://t.me/ftmbotzx_support)**")
         
 
 @Client.on_callback_query(filters.regex(r'^download\|'))
