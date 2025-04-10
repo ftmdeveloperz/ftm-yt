@@ -531,18 +531,18 @@ async def download_audio(client, callback_query, chat_id, youtube_link):
 async def process_youtube_link(client, message):
     chat_id = message.chat.id
 
-    fetching_message = await message.reply_text("🔍 **Fetching available formats... Please wait a moment!**")
+    fetching_message = await message.reply_text("🔍 **Fᴇᴛᴄʜɪɴɢ ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀᴍᴀᴛs... Pʟᴇᴀsᴇ ᴡᴀɪᴛ ᴀ ᴍᴏᴍᴇɴᴛ!**")
     
     if not await db.check_task_limit(chat_id):
         await message.reply_text(
-            "❌ **You have reached your daily task limit! Try again tomorrow.**\n\n"
-            "**To check your remaining tasks and reset time, use the /mytasks command.**"
+            "❌ **Yᴏᴜ ʜᴀᴠᴇ ʀᴇᴀᴄʜᴇᴅ ʏᴏᴜʀ ᴅᴀɪʟʏ ᴛᴀsᴋ ʟɪᴍɪᴛ! Tʀʏ ᴀɢᴀɪɴ ᴛᴏᴍᴏʀʀᴏᴡ.**\n\n"
+            "**Tᴏ ᴄʜᴇᴄᴋ ʏᴏᴜʀ ʀᴇᴍᴀɪɴɪɴɢ ᴛᴀsᴋs ᴀɴᴅ ʀᴇsᴇᴛ ᴛɪᴍᴇ, ᴜsᴇ ᴛʜᴇ /ᴍʏᴛᴀsᴋs ᴄᴏᴍᴍᴀɴᴅ.**"
         )
         await fetching_message.delete()
         return
         
     if active_tasks.get(chat_id):
-        await message.reply_text("⏳ **Your previous task is still running. Please wait!**")
+        await message.reply_text("⏳ **Yᴏᴜʀ ᴘʀᴇᴠɪᴏᴜs ᴛᴀsᴋ ɪs sᴛɪʟʟ ʀᴜɴɴɪɴɢ. Pʟᴇᴀsᴇ ᴡᴀɪᴛ!**")
         await fetching_message.delete()
         return
 
@@ -571,7 +571,7 @@ async def process_youtube_link(client, message):
             format_id, size_text = quality_options[quality]
             keyboard_buttons.append([InlineKeyboardButton(f"🎬 {quality}p - {size_text}", callback_data=f"download|{format_id}")])
 
-        keyboard_buttons.append([InlineKeyboardButton(f"🎶 Best Audio", callback_data=f"download_audio")])
+        keyboard_buttons.append([InlineKeyboardButton(f"🎶 Bᴇsᴛ Aᴜᴅɪᴏ", callback_data=f"download_audio")])
         
     except Exception as e:
         logging.exception("Error fetching available formats: %s", e)
@@ -587,7 +587,7 @@ async def process_youtube_link(client, message):
         if thumbnail_url:
             sent_msg = await message.reply_photo(
                 thumbnail_url,
-                caption=f"**🎥 Title:** {title}\n\n**✨ Choose Video Quality to Download:**",
+                caption=f"🎥 **Tɪᴛʟᴇ:** {ᴛɪᴛʟᴇ}\ɴ\ɴ✨ **Cʜᴏᴏsᴇ Vɪᴅᴇᴏ Qᴜᴀʟɪᴛʏ ᴛᴏ Dᴏᴡɴʟᴏᴀᴅ:**",
                 reply_markup=InlineKeyboardMarkup(keyboard_buttons),
                 reply_to_message_id=message.id
             )
