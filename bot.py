@@ -48,7 +48,7 @@ async def check_expired_premium(client):
                     "<b>⚠️ 𝐏𝐫𝐞𝐦𝐢𝐮𝐦 𝐌𝐞𝐦𝐛𝐞𝐫𝐬𝐡𝐢𝐩 𝐄𝐱𝐩𝐢𝐫𝐞𝐝!</b>\n\n"
                     "🛑 ʏᴏᴜʀ ᴘʀᴇᴍɪᴜᴍ ᴀᴄᴄᴇss ʜᴀs ᴇxᴘɪʀᴇᴅ.\n"
                     "💖 ᴛʜᴀɴᴋ ʏᴏᴜ ꜰᴏʀ ᴜsɪɴɢ ᴏᴜʀ sᴇʀᴠɪᴄᴇ 😊\n\n"
-                    "🔄 **Renew Your Plan** - @MovieGroup_Support"
+                    "🔄 **Renew Your Plan** - @ftmbotzx_support"
                 )
 
                 await client.send_message(chat_id=user_id, text=message_text)
