@@ -15,73 +15,74 @@ logger = logging.getLogger(__name__)
 @Client.on_message(filters.command("start"))
 async def start(client, message):
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("❓ Help", callback_data="help"), InlineKeyboardButton("ℹ️ About", callback_data="about")],
-        [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/ftmbotzx")]
+        [InlineKeyboardButton("❓ Hᴇʟᴘ", callback_data="help"), InlineKeyboardButton("ℹ️ Aʙᴏᴜᴛ", callback_data="about")],
+        [InlineKeyboardButton("📢 Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ", url="https://t.me/ftmbotzx")]
     ])
-    if not await db.is_user_exist(message.from_u09ser.id):
+    if not await db.is_user_exist(message.from_user.id):
         await db.add_user(message.from_user.id, message.from_user.first_name)
         await client.send_message(
             LOG_CHANNEL, 
             f"**#NewUser 🔻**\n**ID -> `{message.from_user.id}`**\n**Name -> {message.from_user.mention}**"
         )
     await message.reply_text(
-        "🎬✨ ᴡᴇʟᴄᴏᴍᴇ ᴛᴏ **Fᴛᴍ TᴜʙᴇFᴇᴛᴄʜ** ✨🎬\n\n"
-        "🚀 ʏᴏᴜʀ ᴜʟᴛɪᴍᴀᴛᴇ ᴅᴇsᴛɪɴᴀᴛɪᴏɴ ꜰᴏʀ ᴅᴏᴡɴʟᴏᴀᴅɪɴɢ ʏᴏᴜᴛᴜʙᴇ 🎥 ᴠɪᴅᴇᴏs, sʜᴏʀᴛs & ᴀᴜᴅɪᴏs ɪɴ sᴇᴄᴏɴᴅs!\n"
-        "💫 ɴᴏ ᴄᴏᴍᴘʟɪᴄᴀᴛɪᴏɴs — ᴊᴜsᴛ sᴇɴᴅ ᴀɴʏ ʏᴏᴜᴛᴜʙᴇ ʟɪɴᴋ ᴀɴᴅ ᴄʜᴏᴏsᴇ ᴍᴘ3/ᴍᴘ4.\n\n"
-        "🔸 **ꜰᴇᴀᴛᴜʀᴇs** 🔸\n"
-        "✅ **Supports Videos, Shorts, MP3, MP4 in HD Quality**\n"
-        "🎵 **Download Audio (MP3) & Video (MP4)**\n"
-        "🔹 **No Watermark, Full HD Quality**\n"
-        "🌟 **Custom Thumbnails for Each Video**\n\n"
-        "✨ **Cʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ](t.me/ftmdeveloperz)**",
+    "ʜᴇʏ ʙʀᴏ! ɪ'ᴍ ғᴛᴍ ᴛᴜʙᴇғᴇᴛᴄʜ ʙᴏᴛ 🎬\n\n"
+    "ɪ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ ʏᴏᴜᴛᴜʙᴇ ᴠɪᴅᴇᴏs ᴡɪᴛʜ ᴛʜᴜᴍʙɴᴀɪʟs.\n"
+    "ʙᴏᴛ ᴡɪʟʟ ʀᴇᴍᴀɪɴ ᴀᴄᴛɪᴠᴇ ᴇᴠᴇɴ ɪғ ᴀʙᴜsᴇᴅ. ✅\n\n"
+    "ᴛᴏ ᴜsᴇ ᴛʜɪs ʙᴏᴛ, ʏᴏᴜ ᴍᴜsᴛ ʙᴇ ᴀ sᴜʙsᴄʀɪʙᴇʀ ᴏғ @ғᴛᴍʙᴏᴛᴢx.\n"
+    "ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴍᴏᴠᴇ ʟɪᴍɪᴛs, ʙᴜʏ ᴀ ᴘʀᴇᴍɪᴜᴍ ᴘʟᴀɴ ɴᴏᴡ ❤️\n\n"
+    "────────────────────────\n"
+    "✨ **ᴄʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[ғᴛᴍ ᴅᴇᴠᴇʟᴏᴘᴇʀᴢ](t.me/ftmdeveloperz)**",
         reply_markup=buttons                
     )
 
 @Client.on_callback_query(filters.regex("start"))
 async def start_hendler(client, callback_query):
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("❓ Help", callback_data="help"), InlineKeyboardButton("ℹ️ About", callback_data="about")],
-        [InlineKeyboardButton("📢 Updates Channel", url="https://t.me/ftmbotzx")]
+        [InlineKeyboardButton("❓ Hᴇʟᴘ", callback_data="help"), InlineKeyboardButton("ℹ️ Aʙᴏᴜᴛ", callback_data="about")],
+        [InlineKeyboardButton("📢 Uᴘᴅᴀᴛᴇs Cʜᴀɴɴᴇʟ", url="https://t.me/ftmbotzx")]
     ])
     
     await callback_query.message.edit_text(
-    "🎬✨ **Welcome to the Ultimate YouTube Downloader!** ✨🎬\n\n"
-    "🚀 **Download YouTube Videos, Shorts & Music Instantly!** 🎶\n"
-    "💫 Just send any YouTube link & get **high-speed downloads in seconds!**\n\n"
-    "⚡ **Fast & Secure Downloads**\n"
-    "✅ **Supports Videos, Shorts, MP3, MP4 in HD Quality**\n"
-    "🎵 **Download Audio (MP3) & Video (MP4)**\n"
-    "ꜱᴛᴀʀᴛ ʙʏ ᴅʀᴏᴘᴘɪɴɢ ᴀ ʟɪɴᴋ ʙᴇʟᴏᴡ! \n\n"
-    "💖 **Enjoy Hassle-Free Downloads!** 💖"
-    " ────────────────────────\n"
-    "✨ **Cʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ**](t.me/ftmdeveloperz)",
-    reply_markup=buttons                
-    )0
+    "ʜᴇʏ ʙʀᴏ! ɪ'ᴍ ғᴛᴍ ᴛᴜʙᴇғᴇᴛᴄʜ ʙᴏᴛ 🎬\n\n"
+    "ɪ ᴄᴀɴ ᴅᴏᴡɴʟᴏᴀᴅ ʏᴏᴜᴛᴜʙᴇ ᴠɪᴅᴇᴏs ᴡɪᴛʜ ᴛʜᴜᴍʙɴᴀɪʟs.\n"
+    "ʙᴏᴛ ᴡɪʟʟ ʀᴇᴍᴀɪɴ ᴀᴄᴛɪᴠᴇ ᴇᴠᴇɴ ɪғ ᴀʙᴜsᴇᴅ. ✅\n\n"
+    "ᴛᴏ ᴜsᴇ ᴛʜɪs ʙᴏᴛ, ʏᴏᴜ ᴍᴜsᴛ ʙᴇ ᴀ sᴜʙsᴄʀɪʙᴇʀ ᴏғ @ғᴛᴍʙᴏᴛᴢx.\n"
+    "ɪғ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ʀᴇᴍᴏᴠᴇ ʟɪᴍɪᴛs, ʙᴜʏ ᴀ ᴘʀᴇᴍɪᴜᴍ ᴘʟᴀɴ ɴᴏᴡ ❤️\n\n"
+    "────────────────────────\n"
+    "✨ **ᴄʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[ғᴛᴍ ᴅᴇᴠᴇʟᴏᴘᴇʀᴢ](t.me/ftmdeveloperz)**",
+        reply_markup=buttons                
+    )
+
 
 
 @Client.on_callback_query(filters.regex("help"))
 async def help(client, callback_query):
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("⬅️ Back", callback_data="start"), InlineKeyboardButton("ℹ️ About", callback_data="about")]
+         [InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"), InlineKeyboardButton("ℹ️ Aʙᴏᴜᴛ", callback_data="about")]
+     
     ])
     
     await callback_query.message.edit_text(
-        "**❓ Help Guide - YouTube Downloader**\n\n"
-        "📌 Just send any **YouTube video link** here.\n"
-        "🔹 The bot will instantly fetch & send your download link.\n"
-        "🎥 **Supports MP4 (Video) & MP3 (Audio) Downloads**\n"
-        "🎵 **High-Quality Audio & Video** (upto 320kbps & 4K)\n"
-        "🌟 **Custom Thumbnail Support**\n\n"
-        "**🖼️ Thumbnail Features:**\n"
-        "➤ Add a custom thumbnail using `/add_thumbnail`\n"
-        "➤ Remove thumbnail using `/remove_thumbnail`\n"
-        "➤ View your current thumbnail using `/show_thumbnail`\n"
-        "➤ If no custom thumbnail is added, the bot will **auto-fetch the YouTube thumbnail**.\n\n"
-        "**🎬 How to Download?**\n"
-        "1️⃣ Send a YouTube link.\n"
-        "2️⃣ Choose between **MP3 (Audio) or MP4 (Video).**\n"
-        "3️⃣ Get your download instantly!\n\n"
-        "🚀 **Fast, Secure & Unlimited Downloads!** 💖",
+    "🆘 **ʜᴏᴡ ᴛᴏ ᴜsᴇ ғᴛᴍ ᴛᴜʙᴇғᴇᴛᴄʜ**\n\n"
+    "🎥 ᴊᴜsᴛ sᴇɴᴅ ᴀɴʏ ʏᴏᴜᴛᴜʙᴇ ʟɪɴᴋ (ᴠɪᴅᴇᴏ/ᴀᴜᴅɪᴏ)\n"
+    "🧾 ᴛʜᴇ ʙᴏᴛ ᴡɪʟʟ ғᴇᴛᴄʜ ᴀʟʟ ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀᴍᴀᴛs\n"
+    "⬇️ ᴄʜᴏᴏsᴇ ᴛʜᴇ ғᴏʀᴍᴀᴛ ʏᴏᴜ ᴡᴀɴᴛ ᴛᴏ ᴅᴏᴡɴʟᴏᴀᴅ\n"
+    "📦 ᴛʜᴇ ʙᴏᴛ ᴡɪʟʟ ᴘʀᴏᴄᴇss ᴀɴᴅ sᴇɴᴅ ᴛʜᴇ ғɪʟᴇ\n\n"
+    "⚙️ **ᴄᴏᴍᴍᴀɴᴅs:**\n"
+    "/start - ʀᴇsᴛᴀʀᴛ ᴛʜᴇ ʙᴏᴛ\n"
+    "/help - sʜᴏᴡ ᴛʜɪs ʜᴇʟᴘ ᴍᴇssᴀɢᴇ\n"
+    "/myplan - ᴄʜᴇᴄᴋ ʏᴏᴜʀ sᴜʙsᴄʀɪᴘᴛɪᴏɴ ᴅᴇᴛᴀɪʟs\n"
+     "🌟 **ᴄᴜsᴛᴏᴍ ᴛʜᴜᴍʙɴᴀɪʟ sᴜᴘᴘᴏʀᴛ**\n\n"
+         "**🖼️ ᴛʜᴜᴍʙɴᴀɪʟ ꜰᴇᴀᴛᴜʀᴇs:**\n"
+           "➤ ᴀᴅᴅ ᴀ ᴄᴜsᴛᴏᴍ ᴛʜᴜᴍʙɴᴀɪʟ ᴜsɪɴɢ `/add_thumbnail`\n"
+           "➤ ʀᴇᴍᴏᴠᴇ ᴛʜᴜᴍʙɴᴀɪʟ ᴜsɪɴɢ `/remove_thumbnail`\n"
+           "➤ ᴠɪᴇᴡ ʏᴏᴜʀ ᴄᴜʀʀᴇɴᴛ ᴛʜᴜᴍʙɴᴀɪʟ ᴜsɪɴɢ `/show_thumbnail`\n"
+           "➤ ɪꜰ ɴᴏ ᴄᴜsᴛᴏᴍ ᴛʜᴜᴍʙɴᴀɪʟ ɪs ᴀᴅᴅᴇᴅ, ᴛʜᴇ ʙᴏᴛ ᴡɪʟʟ **ᴀᴜᴛᴏ-ꜰᴇᴛᴄʜ ᴛʜᴇ ʏᴏᴜᴛᴜʙᴇ ᴛʜᴜᴍʙɴᴀɪʟ**.\n"
+     "❗ᴅᴏ ɴᴏᴛ sᴇɴᴅ ᴍᴜʟᴛɪᴘʟᴇ ʟɪɴᴋs ᴀᴛ ᴏɴᴄᴇ.\n"
+    "👑 ᴜᴘɢʀᴀᴅᴇ ᴛᴏ ᴘʀᴇᴍɪᴜᴍ ғᴏʀ ᴜɴʟɪᴍɪᴛᴇᴅ ᴅᴏᴡɴʟᴏᴀᴅs\n"
+    "🧾 sᴇɴᴅ ᴘᴀʏᴍᴇɴᴛ ᴘʀᴏᴏғ ᴛᴏ: @ғᴛᴍᴅᴇᴠᴇʟᴏᴘᴇʀᴢ\n\n"
+    "────────────────────────\n"
+    "✨ **ᴄʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[ғᴛᴍ ᴅᴇᴠᴇʟᴏᴘᴇʀᴢ](https://t.me/ftmdeveloperz)**",
         reply_markup=buttons
     )
     
@@ -90,22 +91,26 @@ async def help(client, callback_query):
 @Client.on_callback_query(filters.regex("about"))
 async def about(client, callback_query):
     buttons = InlineKeyboardMarkup([
-        [InlineKeyboardButton("⬅️ Back", callback_data="start"), InlineKeyboardButton("❓ Help", callback_data="help")]
+        [InlineKeyboardButton("⬅️ Bᴀᴄᴋ", callback_data="start"), InlineKeyboardButton("❓ Hᴇʟᴘ", callback_data="help")]
     ])
     
     await callback_query.message.edit_text(
-        "**ℹ️ About This Bot**\n\n"
-        "🎬 **YouTube Video & Audio Downloader**\n"
-        "🚀 **Fastest YouTube downloader with custom thumbnail support!**\n"
-        "🎥 **Supports:** MP4 (Video) & MP3 (Audio)\n"
-        "🔹 **High-Quality Downloads** (upto 320kbps & 1080p)\n"
-        "🖼️ **Custom Thumbnail Support**\n\n"
-        "**⚡ Features:**\n"
-        "➤ **Blazing Fast & Secure**\n"
-        "➤ **Unlimited Downloads**\n"
-        "➤ **Easy-to-use Interface**\n\n"
-        "💎 **Developed By: [Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ](https://t.me/ftmdeveloperz)**\n"
-        "💖 **Enjoy & Share!**",
+     ABOUT_TEXT = (
+    "ℹ️ **ᴀʙᴏᴜᴛ ғᴛᴍ ᴛᴜʙᴇғᴇᴛᴄʜ**\n\n"
+    "🎬 ᴛʜɪs ɪs ᴀ ᴘᴏᴡᴇʀғᴜʟ ʏᴏᴜᴛᴜʙᴇ ᴅᴏᴡɴʟᴏᴀᴅ ʙᴏᴛ ᴍᴀᴅᴇ ғᴏʀ ᴛᴇʟᴇɢʀᴀᴍ.\n"
+    "⚡ ᴊᴜsᴛ sᴇɴᴅ ᴀ ʏᴏᴜᴛᴜʙᴇ ʟɪɴᴋ ᴀɴᴅ ɢᴇᴛ ʜɪɢʜ-Qᴜᴀʟɪᴛʏ ᴠɪᴅᴇᴏ/ᴀᴜᴅɪᴏ.\n"
+    "✅ sᴜᴘᴘᴏʀᴛs ᴍᴜʟᴛɪᴘʟᴇ ғᴏʀᴍᴀᴛs (ᴀᴜᴅɪᴏ/ᴠɪᴅᴇᴏ/ᴅᴏᴄ).\n"
+    "🔒 ᴘʀᴇᴍɪᴜᴍ ᴜsᴇʀs ɢᴇᴛ ᴜɴʟɪᴍɪᴛᴇᴅ ᴅᴀɪʟʏ ᴅᴏᴡɴʟᴏᴀᴅs, ᴇxᴛʀᴀ sᴘᴇᴇᴅ & ᴇxᴄʟᴜsɪᴠᴇ ғᴇᴀᴛᴜʀᴇs.\n"
+    "🧠 ʙᴏᴛ ᴅᴇᴠᴇʟᴏᴘᴇᴅ ᴡɪᴛʜ sᴍᴀʀᴛ ǫᴜᴇᴜᴇ ᴍᴀɴᴀɢᴇᴍᴇɴᴛ, sᴛʀᴇss ʜᴀɴᴅʟɪɴɢ, ᴀɴᴅ ᴀᴅᴠᴀɴᴄᴇᴅ ᴜsᴇʀ ᴄᴏɴᴛʀᴏʟ.\n\n"
+    "👤 ᴏᴡɴᴇʀ:**[ғᴛᴍ ᴅᴇᴠᴇʟᴏᴘᴇʀᴢ](https://t.me/ftmdeveloperz)**\n"
+    "👨‍💻 ᴅᴇᴠᴇʟᴏᴘᴇʀ: **[ғᴛᴍ ᴅᴇᴠᴇʟᴏᴘᴇʀᴢ](https://t.me/ftmdeveloperz)**\n"
+    "📡 ᴏғғɪᴄɪᴀʟ ᴄʜᴀɴɴᴇʟ:**[ғᴛᴍʙᴏᴛᴢx](https://t.me/ftmbotzx)**\n\n"
+    "🔧 **ʜᴏᴡ ᴛᴏ ᴜsᴇ:**\n"
+    "➤ sᴇɴᴅ ᴀɴʏ ʏᴏᴜᴛᴜʙᴇ ʟɪɴᴋ (ᴠɪᴅᴇᴏ/ᴍᴜsɪᴄ)\n"
+    "➤ ᴄʜᴏᴏsᴇ ᴏᴜᴛᴘᴜᴛ ғᴏʀᴍᴀᴛ (ᴀᴜᴅɪᴏ/ᴠɪᴅᴇᴏ/ᴅᴏᴄ)\n"
+    "➤ ᴡᴀɪᴛ ғᴏʀ ᴀ ᴍᴏᴍᴇɴᴛ ᴀɴᴅ ᴛᴀᴘ ᴏɴ ᴛʜᴇ ғɪʟᴇ sᴇɴᴛ ʙʏ ʙᴏᴛ\n\n"
+    "────────────────────────\n"
+    "✨ **ᴄʀᴇᴀᴛᴇᴅ ᴡɪᴛʜ ʟᴏᴠᴇ ʙʏ**: **[ғᴛᴍ ᴅᴇᴠᴇʟᴏᴘᴇʀᴢ](https://t.me/ftmdeveloperz)**",
         reply_markup=buttons,
         disable_web_page_preview=True
     )
