@@ -192,8 +192,82 @@ async def show_active_tasks(client, message):
 
     total_tasks = len(active_tasks)
     await message.reply(f"**🧾 Active Tasks (Total: {total_tasks})**")
- 
 
+@Client.on_message(filters.command("plan"))
+async def show_plans(bot, message):
+    user_name = message.from_user.first_name or "Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ"
+
+    caption = (
+        f"👋 ʜᴇʏ <b>{user_name}</b>,\n\n"
+        "🎁 <b>ꜰᴛᴍ ᴛᴜʙᴇꜰᴇᴛᴄʜ ᴘʀᴇᴍɪᴜᴍ ᴘʟᴀɴꜱ</b>:\n"
+        "➤ ᴜɴʟɪᴍɪᴛᴇᴅ ᴅᴏᴡɴʟᴏᴀᴅꜱ ɪɴ ᴀʟʟ ᴘʟᴀɴꜱ\n"
+        "➤ ɴᴏ ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ ɴᴇᴇᴅᴇᴅ\n"
+        "➤ ᴀᴅꜰʀᴇᴇ & ꜰᴀꜱᴛᴇʀ ᴇxᴘᴇʀɪᴇɴᴄᴇ\n"
+        "➤ ꜰᴜᴛᴜʀᴇ ꜰᴇᴀᴛᴜʀᴇ ᴀᴄᴄᴇꜱꜱ (ᴜʟᴛʀᴀ+ ᴏɴʟʏ)\n\n"
+        "🎉 ᴏɴ ᴛʜᴇ ᴏᴄᴄᴀꜱɪᴏɴ ᴏꜰ ᴍʏ ʙɪʀᴛʜ, ɪᴛ'ꜱ ᴀᴛ ᴍɪɴɪᴍᴀʟ ᴄᴏꜱᴛ!\n\n"
+        "❗ ꜱᴇɴᴅ ᴘᴀʏᴍᴇɴᴛ ꜱᴄʀᴇᴇɴꜱʜᴏᴛ ᴛᴏ @ftmdeveloperz ᴛᴏ ɢᴇᴛ ᴜᴘɢʀᴀᴅᴇᴅ."
+    )
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🥉 ʙᴀsɪᴄ | ||₹2||", callback_data="plan_basic")],
+        [InlineKeyboardButton("🥈 ᴘʟᴜs | ||₹5||", callback_data="plan_plus")],
+        [InlineKeyboardButton("🥇 ᴘʀᴏ | ||₹10||", callback_data="plan_pro")],
+        [InlineKeyboardButton("💎 ᴜʟᴛʀᴀ | ||₹20||", callback_data="plan_ultra")],
+        [InlineKeyboardButton("🌟 ᴜʟᴛʀᴀ+ | ||₹30||", callback_data="plan_ultra_plus")],
+        [InlineKeyboardButton("💰 sᴇɴᴅ ᴘᴀʏᴍᴇɴᴛ", url="https://t.me/ftmdeveloperz")]
+    ])
+
+    await message.reply_photo(
+        photo="https://envs.sh/GMp.jpg",
+        caption=caption,
+        reply_markup=keyboard,
+        parse_mode="html"
+    )
+
+@Client.on_callback_query()
+async def plan_details(bot, query: CallbackQuery):
+    data = query.data
+    text = ""
+
+    if data == "plan_basic":
+        text = (
+            "🥉 <b>ʙᴀsɪᴄ ᴘʟᴀɴ</b>\n"
+            "📅 ᴠᴀʟɪᴅɪᴛʏ: 7 ᴅᴀʏꜱ\n"
+            "♾️ ᴜɴʟɪᴍɪᴛᴇᴅ ᴅᴏᴡɴʟᴏᴀᴅꜱ\n"
+            "⚠️ ɴᴏ ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ ɴᴇᴇᴅᴇᴅ"
+        )
+    elif data == "plan_plus":
+        text = (
+            "🥈 <b>ᴘʟᴜs ᴘʟᴀɴ</b>\n"
+            "📅 ᴠᴀʟɪᴅɪᴛʏ: 3 ᴡᴇᴇᴋꜱ\n"
+            "♾️ ᴜɴʟɪᴍɪᴛᴇᴅ ᴅᴏᴡɴʟᴏᴀᴅꜱ\n"
+            "⚠️ ɴᴏ ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ ɴᴇᴇᴅᴇᴅ"
+        )
+    elif data == "plan_pro":
+        text = (
+            "🥇 <b>ᴘʀᴏ ᴘʟᴀɴ</b>\n"
+            "📅 ᴠᴀʟɪᴅɪᴛʏ: 2 ᴍᴏɴᴛʜꜱ\n"
+            "♾️ ᴜɴʟɪᴍɪᴛᴇᴅ ᴅᴏᴡɴʟᴏᴀᴅꜱ\n"
+            "⚠️ ɴᴏ ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ ɴᴇᴇᴅᴇᴅ"
+        )
+    elif data == "plan_ultra":
+        text = (
+            "💎 <b>ᴜʟᴛʀᴀ ᴘʟᴀɴ</b>\n"
+            "📅 ᴠᴀʟɪᴅɪᴛʏ: 6 ᴍᴏɴᴛʜꜱ\n"
+            "♾️ ᴜɴʟɪᴍɪᴛᴇᴅ ᴅᴏᴡɴʟᴏᴀᴅꜱ\n"
+            "⚠️ ɴᴏ ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ ɴᴇᴇᴅᴇᴅ"
+        )
+    elif data == "plan_ultra_plus":
+        text = (
+            "🌟 <b>ᴜʟᴛʀᴀ+ ᴘʟᴀɴ</b>\n"
+            "📅 ᴠᴀʟɪᴅɪᴛʏ: 1 ʏᴇᴀʀ\n"
+            "♾️ ᴜɴʟɪᴍɪᴛᴇᴅ ᴅᴏᴡɴʟᴏᴀᴅꜱ\n"
+            "✨ ꜰɪʀꜱᴛ ᴀᴄᴄᴇꜱꜱ ᴛᴏ ꜰᴜᴛᴜʀᴇ ꜰᴇᴀᴛᴜʀᴇꜱ (ᴄʟᴏɴᴇ, ᴇᴛᴄ)\n"
+            "⚠️ ɴᴏ ᴠᴇʀɪꜰɪᴄᴀᴛɪᴏɴ ɴᴇᴇᴅᴇᴅ"
+        )
+
+    await query.answer()
+    await query.message.reply(text, parse_mode="html")
 
 
 
@@ -201,7 +275,7 @@ async def show_active_tasks(client, message):
 import os
 import sys
 
-@Client.on_message(filters.command("restart1") & filters.user(ADMINS))
+@Client.on_message(filters.command("restart") & filters.user(ADMINS))
 async def restart_cmd(_, message):
     await message.reply("♻️ Restarting bot...")
 
