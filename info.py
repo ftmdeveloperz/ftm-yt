@@ -3,8 +3,8 @@ import os
 SESSION = "ftmbotzx"
 API_ID = int(os.getenv("API_ID", 22141398))
 API_HASH = os.getenv("API_HASH", '0c8f8bd171e05e42d6f6e5a6f4305389')
-BOT_TOKEN = os.getenv("BOT_TOKEN", "8105194942:AAHisU5gxAc77O5qKoAZluI86w10s9MBV5o")
-LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "-1002613994353"))
+BOT_TOKEN = os.getenv("BOT_TOKEN", "8034842897:AAGPe1jupyBxXLqgI00FAXozT8FtS96vqsE")
+LOG_CHANNEL = int(os.getenv("LOG_CHANNEL", "-1002408031025"))
 DUMP_CHANNEL = int(os.getenv("DUMP_CHANNEL", "-1002613994353"))
 PORT = int(os.getenv("PORT", "8080"))
 FORCE_CHANNEL = int(os.getenv("FORCE_CHANNEL", "-1002087228619"))
