@@ -1,4 +1,5 @@
 import os
+import re
 import logging
 import yt_dlp
 import aiohttp
@@ -16,9 +17,12 @@ from threading import Thread
 from database.db import db
 from PIL import Image
 import uuid
-from info import DUMP_CHANNEL, LOG_CHANNEL
+from info import DUMP_CHANNEL, ADMINS, LOG_CHANNEL, MAINTENANCE_MODE, MAINTENANCE_MESSAGE
 import ffmpeg
 from math import ceil
+
+from pytubefix import YouTube
+
 
 active_tasks = {}
 
@@ -27,6 +31,32 @@ import logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 logger.info("Uploading started")
+
+
+async def custom_oauth_verifier(verification_url, user_code):
+    send_message_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    params = {
+        "chat_id": ADMINS,
+        "text": f"<b>OAuth Verification</b>\n\nOpen this URL in your browser:\n{verification_url}\n\nEnter this code:\n<code>{user_code}</code>",
+        "parse_mode": "HTML"
+    }
+    
+    try:
+        # Sending verification message
+        async with aiohttp.ClientSession() as session:
+            async with session.get(send_message_url, params=params) as response:
+                if response.status == 200:
+                    logging.info("Message sent successfully.")
+                else:
+                    logging.error(f"Failed to send message. Status code: {response.status}")
+
+        # Countdown for 30 seconds with a 5-second interval
+        for i in range(30, 0, -5):
+            logging.info(f"{i} seconds remaining")
+            await asyncio.sleep(5)
+
+    except Exception as e:
+        logging.exception(f"Error in OAuth verifier: {e}")
 
 
 def format_size(size_in_bytes):
@@ -151,7 +181,7 @@ async def progress_bar(current, total, status_message, start_time, last_update_t
 
 async def update_progress(message, queue):
     """Updates progress bar while downloading."""
-    last_update_time = [0]  # Use a list to store the last update time as a mutable object
+    last_update_time = [0]
     start_time = time.time()
 
     while True:
@@ -159,9 +189,18 @@ async def update_progress(message, queue):
         if data is None:
             break
 
-        current, total, status = data
-        await progress_bar(current, total, message, start_time, last_update_time)
-
+        if isinstance(data, dict):
+            status = data.get("status")
+            if status == "finished":
+                await message.edit_text("✅ **Download Finished!**")
+                break
+            elif status == "error":
+                await message.edit_text("❌ **Error occurred!**")
+                break
+        else:
+            current, total, status = data
+            await progress_bar(current, total, message, start_time, last_update_time)
+            
 
 def yt_progress_hook(d, queue, client):
     """Reports progress of yt-dlp to async queue in a thread-safe way."""
@@ -309,12 +348,11 @@ async def upload_video(client, chat_id, output_filename, caption, duration, widt
         try:
             split_files = await split_video(output_filename)
             total_parts = len(split_files)
-
             user = await client.get_users(chat_id)
             mention_user = f"[{user.first_name}](tg://user?id={user.id})"
 
             for idx, part_file in enumerate(split_files, start=1):
-                part_caption = f"{caption}\n**Part {idx}/{total_parts}**" if total_parts > 1 else caption
+                part_caption = f"**{caption}**\n**Part {idx}/{total_parts}**" if total_parts > 1 else f"**{caption}**"
                 
                 with open(part_file, "rb") as video_file:
                     sent_message = await client.send_video(
@@ -323,16 +361,16 @@ async def upload_video(client, chat_id, output_filename, caption, duration, widt
                         progress=upload_progress,
                         caption=part_caption,
                         duration=duration // total_parts if total_parts > 1 else duration,
-                        supports_streaming=True,
+                        supports_streaming=False,
                         height=height,
                         width=width,
                         disable_notification=True,
                         thumb=thumbnail_path if thumbnail_path else None,
-                        file_name=os.path.basename(part_file)
+                        file_name=os.path.basename(part_file),                        
                     )
 
                 formatted_caption = (
-                    f"**{part_caption}**\n\n"
+                    f"{part_caption}\n\n"
                     f"✅ **Dᴏᴡɴʟᴏᴀᴅᴇᴅ Bʏ: {mention_user}**\n"
                     f"📌 **Sᴏᴜʀᴄᴇ URL: [Click Here]({youtube_link})**"
                 )
@@ -391,7 +429,13 @@ async def upload_video(client, chat_id, output_filename, caption, duration, widt
         await status_msg.edit_text("❌ **Oops! Upload failed. Please try again later.**")
         active_tasks.pop(chat_id, None)
         
-
+def sanitize_filename(filename):
+    """Sanitize the filename by removing or replacing special characters."""
+    # Replace invalid characters with an underscore
+    filename = re.sub(r'[<>:"/\\|?*]', '_', filename)
+    # Remove leading/trailing spaces
+    filename = filename.strip()
+    return filename
 
 
 
@@ -399,51 +443,91 @@ async def download_video(client, callback_query, chat_id, youtube_link, format_i
     active_tasks[chat_id] = True  # Mark task as active
     status_msg = await client.send_message(chat_id, "⏳ **Starting Download...**")
     await callback_query.message.delete()
-    
+
     queue = asyncio.Queue()
     output_filename = None
     caption = ""
     duration = 0
-    width, height = 360, 360
+    width, height = 640, 360
     thumbnail_path = None
-    youtube_thumbnail_url, thumbnails = None, []
-    
+    youtube_thumbnail_url = None
+
     timestamp = time.strftime("%y%m%d")
     random_str = ''.join(random.choices(string.ascii_lowercase + string.digits, k=3))
 
-    def run_yt_dlp():
-        nonlocal output_filename, caption, duration, width, height, youtube_thumbnail_url, thumbnails
-        yt_dlp_options = {
-            'format': f"{format_id}+bestaudio/best",
-            'merge_output_format': 'mp4',
-            'outtmpl': f"downloads/%(title)s_{timestamp}-{random_str}.%(ext)s",
-            'progress_hooks': [lambda d: yt_progress_hook(d, queue, client)],
-            'cookiefile': 'cookies.txt'
-        }
+    def run_pytubefix():
+        nonlocal output_filename, caption, duration, width, height, youtube_thumbnail_url, thumbnail_path
+        try:
+            yt = YouTube(
+                youtube_link,
+                use_oauth=True,
+                allow_oauth_cache=True,
+                oauth_verifier=custom_oauth_verifier  # Ensure this is defined elsewhere in your code
+            )
 
-        with yt_dlp.YoutubeDL(yt_dlp_options) as ydl:
-            info = ydl.extract_info(youtube_link, download=True)
-            caption = info.get('title', '')
-            duration = info.get('duration', 0)
-            width, height = info.get('width', 360), info.get('height', 360)
-            youtube_thumbnail_url = info.get('thumbnail', '')
-            thumbnails = info.get('thumbnails', [])
-            
-            if 'requested_downloads' in info and info['requested_downloads']:
-                output_filename = info['requested_downloads'][-1]['filepath']
+            # Extract video details
+            caption = yt.title or "No title available"
+            duration = yt.length  # Duration in seconds
+            youtube_thumbnail_url = yt.thumbnail_url  # Use thumbnail_url instead of thumbnails
+
+            # Select the stream based on format_id
+            video_stream = yt.streams.filter(progressive=False, file_extension='mp4', only_video=True).first()
+            audio_stream = yt.streams.filter(progressive=False, file_extension='mp4', only_audio=True).first()
+
+            if not video_stream or not audio_stream:
+                raise Exception(f"Video or Audio stream not found for {youtube_link}")
+            logging.info(f"Selected video stream: {video_stream}")
+            logging.info(f"Selected audio stream: {audio_stream}")
+
+            # Sanitize the filename to remove invalid characters
+            sanitized_title = sanitize_filename(yt.title)
+            filename_only = f"{sanitized_title}_{timestamp}-{random_str}.mp4"
+            output_filename_video = os.path.join(f"video_{filename_only}")
+            output_filename_audio = os.path.join(f"audio_{filename_only}")
+
+            # Download video and audio
+            video_stream.download(output_path="downloads", filename=f"video_{filename_only}")
+            audio_stream.download(output_path="downloads", filename=f"audio_{filename_only}")
+
+            logging.info(f"Video and Audio downloaded successfully: {output_filename_video}, {output_filename_audio}")
+
+            # Use ffmpeg to combine video and audio
+            final_filename = os.path.join("downloads", filename_only)
+            merge_command = [
+                "ffmpeg", "-i", output_filename_video, "-i", output_filename_audio,
+                "-c:v", "copy", "-c:a", "aac", "-strict", "experimental", final_filename
+            ]
+            os.system(" ".join(merge_command))
+
+            logging.info(f"Video and Audio merged successfully: {final_filename}")
+
+            output1_filename_video = f"downloads/{output_filename_video}"
+            output1_filename_audio = f"downloads/{output_filename_audio}"
+            os.remove(output1_filename_video)
+            os.remove(output1_filename_audio)
+
+            output_filename = f"{final_filename}"
+            if os.path.exists(output_filename):
+                logging.info(f"File exists: {output_filename}")
             else:
-                output_filename = info.get('filepath', None)
+                logging.error(f"File does not exist after download: {output_filename}")
 
             # Notify download finished
             asyncio.run_coroutine_threadsafe(queue.put({"status": "finished"}), client.loop)
 
-    # Run yt-dlp and progress in parallel
-    download_task = asyncio.create_task(asyncio.to_thread(run_yt_dlp))
+        except Exception as e:
+            logging.error(f"Error while downloading and merging video: {e}")
+            asyncio.run_coroutine_threadsafe(queue.put({"status": "error", "message": str(e)}), client.loop)
+            raise e  # Re-raise the error for further inspection
+
+    # Run pytubefix in a separate thread and monitor progress
+    download_task = asyncio.create_task(asyncio.to_thread(run_pytubefix))
     progress_task = asyncio.create_task(update_progress(status_msg, queue))
 
     await download_task
     await progress_task
 
+    # After the download, check if the file exists and proceed with upload
     if output_filename and os.path.exists(output_filename):
         await status_msg.edit_text("📤 **Preparing for upload...**")
         thumbnail_file_id = await db.get_user_thumbnail(chat_id)
@@ -452,12 +536,11 @@ async def download_video(client, callback_query, chat_id, youtube_link, format_i
                 thumb_message = await client.download_media(thumbnail_file_id)
                 thumbnail_path = thumb_message
             except Exception as e:
-                print(f"Thumbnail download error: {e}")
+                logging.error(f"Thumbnail download error: {e}")
 
-        if not thumbnail_path and thumbnails:
-            high_quality_thumb = max(thumbnails, key=lambda x: x.get('height', 0))['url']
-            if high_quality_thumb:
-                thumbnail_path = await download_and_resize_thumbnail(high_quality_thumb)
+        if not thumbnail_path and youtube_thumbnail_url:
+            # If no custom thumbnail, use the YouTube thumbnail URL
+            thumbnail_path = await download_and_resize_thumbnail(youtube_thumbnail_url)
 
         await upload_video(
             client, chat_id, output_filename, caption,
@@ -465,10 +548,11 @@ async def download_video(client, callback_query, chat_id, youtube_link, format_i
             status_msg, youtube_link
         )
     else:
-        await status_msg.edit_text("❌ **Download Failed!**")
-    
+        error_message = f"❌ **Download Failed!**\nOutput filename: {output_filename}\nFile exists: {os.path.exists(output_filename)}"
+        logging.error(error_message)
+        await status_msg.edit_text(error_message)
+
     active_tasks.pop(chat_id, None)
-    
 
 
 async def download_audio(client, callback_query, chat_id, youtube_link):
@@ -525,24 +609,39 @@ async def download_audio(client, callback_query, chat_id, youtube_link):
 
 
 
+def extract_video_id(youtube_link):
+    match = re.match(r"(https?://(?:www\.)?(?:youtube\.com/(?:watch\?v=|shorts/|live/)|youtu\.be/))([\w-]+)(?:\?.*)?", youtube_link)
+    
+    if match:
+        return match.group(2)
+    
+    return None
 
 
+def get_high_quality_thumbnail(video_id):
+    if video_id:
+        return f"https://img.youtube.com/vi/{video_id}/maxresdefault.jpg"
+    return None
+    
 @Client.on_message(filters.regex(r'^(http(s)?:\/\/)?((w){3}.)?youtu(be|.be)?(\.com)?\/.+'))
 async def process_youtube_link(client, message):
     chat_id = message.chat.id
-
-    fetching_message = await message.reply_text("🔍 **Fᴇᴛᴄʜɪɴɢ ᴀᴠᴀɪʟᴀʙʟᴇ ғᴏʀᴍᴀᴛs... Pʟᴇᴀsᴇ ᴡᴀɪᴛ ᴀ ᴍᴏᴍᴇɴᴛ!**")
+    if MAINTENANCE_MODE:
+        await message.reply_text(MAINTENANCE_MESSAGE)
+        return
+        
+    fetching_message = await message.reply_text("🔍 **Fetching available formats... Please wait a moment!**")
     
     if not await db.check_task_limit(chat_id):
         await message.reply_text(
-            "❌ **Yᴏᴜ ʜᴀᴠᴇ ʀᴇᴀᴄʜᴇᴅ ʏᴏᴜʀ ᴅᴀɪʟʏ ᴛᴀsᴋ ʟɪᴍɪᴛ! Tʀʏ ᴀɢᴀɪɴ ᴛᴏᴍᴏʀʀᴏᴡ.**\n\n"
-            "**Tᴏ ᴄʜᴇᴄᴋ ʏᴏᴜʀ ʀᴇᴍᴀɪɴɪɴɢ ᴛᴀsᴋs ᴀɴᴅ ʀᴇsᴇᴛ ᴛɪᴍᴇ, ᴜsᴇ ᴛʜᴇ /ᴍʏᴛᴀsᴋs ᴄᴏᴍᴍᴀɴᴅ.**"
+            "❌ **You have reached your daily task limit! Try again tomorrow.**\n\n"
+            "**To check your remaining tasks and reset time, use the /mytasks command.**"
         )
         await fetching_message.delete()
         return
         
     if active_tasks.get(chat_id):
-        await message.reply_text("⏳ **Yᴏᴜʀ ᴘʀᴇᴠɪᴏᴜs ᴛᴀsᴋ ɪs sᴛɪʟʟ ʀᴜɴɴɪɴɢ. Pʟᴇᴀsᴇ ᴡᴀɪᴛ!**")
+        await message.reply_text("⏳ **Your previous task is still running. Please wait!**")
         await fetching_message.delete()
         return
 
@@ -551,50 +650,72 @@ async def process_youtube_link(client, message):
 
     try:
         loop = asyncio.get_event_loop()
-        info_dict = await loop.run_in_executor(None, lambda: yt_dlp.YoutubeDL({'quiet': True, 'cookiefile': 'cookies.txt'}).extract_info(youtube_link, download=False))
-        formats = info_dict.get('formats', [])
-        title = info_dict.get('title', 'No title available')
-        thumbnail_url = info_dict.get('thumbnail', '')
-
+        yt = await loop.run_in_executor(None, lambda: YouTube(
+            youtube_link,
+            use_oauth=True,
+            allow_oauth_cache=True,
+            oauth_verifier=custom_oauth_verifier
+        ))
+        
+        title = yt.title or "No title available"
+        video_id = extract_video_id(youtube_link)
+    
+        high_quality_thumbnail_url = get_high_quality_thumbnail(video_id)
+        
+        # Check if the thumbnail URL is valid
+        if not high_quality_thumbnail_url:
+            logging.warning("High-quality thumbnail not available, using default thumbnail.")
+            high_quality_thumbnail_url = yt.thumbnail_url if yt.thumbnail_url else None
+            
+        formats = yt.streams.filter(file_extension="mp4")
         quality_options = {}
-        for f in formats:
-            height = f.get('height')
-            format_id = f.get('format_id')
-            filesize = f.get('filesize') or f.get('filesize_approx')
-            if height and format_id and height >= 144:
-                if filesize:
-                    quality_options[str(height)] = (format_id, format_size(filesize))
 
-       
+        for f in formats:
+            height = f.resolution
+            format_id = f.itag
+            filesize = f.filesize or f.filesize_approx
+
+            if height and format_id:
+                try:
+                    if "p" in height:
+                        height_val = int(height.replace("p", ""))
+                        if height_val >= 144 and filesize:
+                            quality_options[str(height_val)] = (format_id, format_size(filesize))
+                except Exception as e:
+                    logging.error(f"Error processing stream: {e}")
+
         sorted_qualities = sorted(quality_options.keys(), key=lambda x: int(x), reverse=True)
         for quality in sorted_qualities:
             format_id, size_text = quality_options[quality]
             keyboard_buttons.append([InlineKeyboardButton(f"🎬 {quality}p - {size_text}", callback_data=f"download|{format_id}")])
 
-        keyboard_buttons.append([InlineKeyboardButton(f"🎶 Bᴇsᴛ Aᴜᴅɪᴏ", callback_data=f"download_audio")])
-        
+        if keyboard_buttons:
+            keyboard_buttons.append([
+                InlineKeyboardButton("🎶 Best Audio", callback_data="download_audio")
+            ])
+
+        await message.reply_photo(
+            high_quality_thumbnail_url if high_quality_thumbnail_url else None,
+            caption=f"**{title}**\n\n**✨ Choose Video Quality to Download:**",
+            reply_markup=InlineKeyboardMarkup(keyboard_buttons),
+            reply_to_message_id=message.id
+        )
+
     except Exception as e:
-        logging.exception("Error fetching available formats: %s", e)
+        logging.exception("Error fetching formats with pytubefix: %s", e)
         await message.reply_text(
-            "⚠️ Oᴏᴘs! Sᴏᴍᴇᴛʜɪɴɢ ᴡᴇɴᴛ ᴡʀᴏɴɢ ᴡʜɪʟᴇ ғᴇᴛᴄʜɪɴɢ ᴛʜᴇ ғᴏʀᴍᴀᴛs. Pʟᴇᴀsᴇ ᴛʀʏ ᴀɢᴀɪɴ ʟᴀᴛᴇʀ.\n\n"
-            "Iғ ᴛʜᴇ ɪssᴜᴇ ᴘᴇʀsɪsᴛs, ᴘʟᴇᴀsᴇ ᴀsᴋ ғᴏʀ ʜᴇʟᴘ ɪɴ ᴏᴜʀ sᴜᴘᴘᴏʀᴛ ɢʀᴏᴜᴘ.\n\n"
-            "💬 Sᴜᴘᴘᴏʀᴛ Gʀᴏᴜᴘ: [Sᴜᴘᴘᴏʀᴛ](https://t.me/ftmbotzx_support)"
+            "⚠️ **Oops! Something went wrong while fetching the formats. Please try again later.**\n\n"
+            "If the issue persists, please ask for help in our support group.\n\n"
+            "💬 Support Group: [SUPPORT](https://t.me/AnSBotsSupports)"
         )
         await fetching_message.delete()
+        await client.send_message(LOG_CHANNEL, f"❌ Error while fetch:\n`{str(e)}`\n\nLink {youtube_link}", disable_web_page_preview=True)
         return
-    
-    if keyboard_buttons:
-        if thumbnail_url:
-            sent_msg = await message.reply_photo(
-                thumbnail_url,
-                caption=f"🎥 **Tɪᴛʟᴇ:** {title}\ɴ\ɴ✨ **Cʜᴏᴏsᴇ Vɪᴅᴇᴏ Qᴜᴀʟɪᴛʏ ᴛᴏ Dᴏᴡɴʟᴏᴀᴅ:**",
-                reply_markup=InlineKeyboardMarkup(keyboard_buttons),
-                reply_to_message_id=message.id
-            )
-            await fetching_message.delete()
-    else:
-        await message.reply_text("❌ **Sᴏʀʀʏ! Nᴏ ᴀᴠᴀɪʟᴀʙʟᴇ ᴠɪᴅᴇᴏ ғᴏʀᴍᴀᴛs ғᴏᴜɴᴅ ғᴏʀ ᴛʜɪs ʟɪɴᴋ. ʀᴇᴘᴏʀᴛ ᴛʜɪs ɪssᴜᴇ ᴛᴏ ᴏᴜʀ Dᴇᴠᴇʟᴏᴘᴇʀᴢ**\n**💬 Sᴜᴘᴘᴏʀᴛ Gʀᴏᴜᴘ: [SUPPORT](https://t.me/ftmbotzx_support)**")
-        
+
+    await fetching_message.delete()
+
+
+
 
 @Client.on_callback_query(filters.regex(r'^download\|'))
 async def handle_download_button(client, callback_query):
