@@ -13,3 +13,5 @@ MONGO_URI = os.getenv("MONGO_URI", "mongodb+srv://ftm:ftm@cluster0.xotfi.mongodb
 MONGO_NAME = os.getenv("MONGO_NAME", "Cluster0")
 ADMINS = [7744665378]
 DAILY_LIMITS = 10 
+MAINTENANCE_MODE = False  # Set to True to activate maintenance mode
+MAINTENANCE_MESSAGE = "⚙️ Fᴛᴍ TᴜʙᴇFᴇᴛᴄʜ is currently under maintenance.\n\nPlease try again later.\n\n– Fᴛᴍ Dᴇᴠᴇʟᴏᴘᴇʀᴢ"
