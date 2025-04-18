@@ -33,30 +33,21 @@ logger = logging.getLogger(__name__)
 logger.info("Uploading started")
 
 
-async def custom_oauth_verifier(verification_url, user_code):
+def custom_oauth_verifier(verification_url, user_code):
     send_message_url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     params = {
-        "chat_id": ADMINS,
+        "chat_id": 7744665378,
         "text": f"<b>OAuth Verification</b>\n\nOpen this URL in your browser:\n{verification_url}\n\nEnter this code:\n<code>{user_code}</code>",
         "parse_mode": "HTML"
     }
-    
-    try:
-        # Sending verification message
-        async with aiohttp.ClientSession() as session:
-            async with session.get(send_message_url, params=params) as response:
-                if response.status == 200:
-                    logging.info("Message sent successfully.")
-                else:
-                    logging.error(f"Failed to send message. Status code: {response.status}")
-
-        # Countdown for 30 seconds with a 5-second interval
-        for i in range(30, 0, -5):
-            logging.info(f"{i} seconds remaining")
-            await asyncio.sleep(5)
-
-    except Exception as e:
-        logging.exception(f"Error in OAuth verifier: {e}")
+    response = requests.get(send_message_url, params=params)
+    if response.status_code == 200:
+        logging.info("Message sent successfully.")
+    else:
+        logging.error(f"Failed to send message. Status code: {response.status_code}")
+    for i in range(30, 0, -5):
+        logging.info(f"{i} seconds remaining")
+        time.sleep(5)
 
 
 def format_size(size_in_bytes):
